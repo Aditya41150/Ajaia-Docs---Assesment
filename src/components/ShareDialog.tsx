@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -42,13 +42,7 @@ export function ShareDialog({ documentId, open, onOpenChange }: ShareDialogProps
   const [selectedUser, setSelectedUser] = useState<string>('')
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (open) {
-      fetchUsersAndShares()
-    }
-  }, [open, documentId])
-
-  const fetchUsersAndShares = async () => {
+  const fetchUsersAndShares = useCallback(async () => {
     if (!user) return
     setLoading(true)
     
@@ -82,7 +76,13 @@ export function ShareDialog({ documentId, open, onOpenChange }: ShareDialogProps
     }
     
     setLoading(false)
-  }
+  }, [user, documentId])
+
+  useEffect(() => {
+    if (open) {
+      fetchUsersAndShares()
+    }
+  }, [open, fetchUsersAndShares])
 
   const handleShare = async () => {
     if (!selectedUser || !user) return

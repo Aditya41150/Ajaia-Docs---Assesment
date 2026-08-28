@@ -4,7 +4,7 @@ export async function parseFileToHtml(file: File): Promise<string> {
   const text = await file.text()
   
   if (file.name.endsWith('.md')) {
-    return marked.parse(text)
+    return await marked.parse(text)
   }
   
   if (file.name.endsWith('.txt')) {
