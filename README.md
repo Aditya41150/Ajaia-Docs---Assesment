@@ -64,6 +64,20 @@ To manually verify the RLS policies work, follow these steps:
 7. Open the document, edit it, and wait for "Saved just now". Refresh the page to see the edits persist.
 8. Switch back to **Aditya**, click Share, and click **Revoke** next to Sarah's name.
 9. Switch to **Sarah**. The document is gone, and direct URL access will fail again.
+## SCREEN SHOTS
+
+# Dashboard
+<img width="1917" height="913" alt="dashboard" src="https://github.com/user-attachments/assets/3526fa3a-f333-457a-b941-012892a29a62" />
+
+# Editor 
+<img width="1917" height="923" alt="editor" src="https://github.com/user-attachments/assets/08c40f03-0a01-4f0a-8422-9e1287a7406f" />
+
+
+# Shairing Section
+<img width="1917" height="926" alt="share" src="https://github.com/user-attachments/assets/529dc4d2-1160-418b-84eb-26c4569893be" />
+
+# Shared Document to Sarah Account
+<img width="1917" height="923" alt="shared" src="https://github.com/user-attachments/assets/02579e9b-fa1d-4afe-a1c8-b68528811f0e" />
 
 ## Deployment
 This project is configured to be deployed on Vercel or any standard static host. Remember to configure the Supabase environment variables on your deployment platform.
