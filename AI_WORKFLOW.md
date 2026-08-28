@@ -6,8 +6,7 @@
 - Tailwind + shadcn/ui components
 
 ## Prompts Used
-*(Evaluator: Fill this in with the primary prompt sets provided for the assessment.)*
-- ...
+
 
 ## What AI Accelerated
 - **Boilerplate**: Instantly generating the Vite config, `tsconfig` paths, and setting up `tailwind.config.js`.

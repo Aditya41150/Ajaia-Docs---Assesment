@@ -1,13 +1,13 @@
 # Ajaia Docs Assessment Submission
 
 ## Live Product
-[URL]
+https://ajaia-docs-assesment.vercel.app/
 
 ## Source Code
-[GitHub/Drive URL]
+https://github.com/Aditya41150/Ajaia-Docs---Assesment
 
 ## Walkthrough Video
-[URL]
+[I will provide this]
 
 ## Demo Users
 Aditya Singh (aditya@example.com)
