@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
@@ -80,31 +80,33 @@ export default function Editor() {
     return () => { isMounted = false }
   }, [id, user, navigate, editor])
 
-  // Simple debounce implementation for save
-  const debouncedSave = useCallback(
-    (() => {
-      let timeoutId: ReturnType<typeof setTimeout>
-      return (content: any) => {
-        clearTimeout(timeoutId)
-        timeoutId = setTimeout(async () => {
-          if (!id || !user) return
-          setSaveStatus('Saving...')
-          const { error } = await supabase
-            .from('documents')
-            .update({ content_json: content, updated_at: new Date().toISOString(), last_updated_by: user.id })
-            .eq('id', id)
-          
-          if (error) {
-            toast.error('Failed to save changes')
-            setSaveStatus('Unsaved changes')
-          } else {
-            setSaveStatus('Saved just now')
-          }
-        }, 1000)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const contextRef = useRef({ id, user })
+  
+  useEffect(() => {
+    contextRef.current = { id, user }
+  }, [id, user])
+
+  // Simple debounce implementation for save that avoids closure traps
+  const debouncedSave = useCallback((content: any) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(async () => {
+      const { id: currentId, user: currentUser } = contextRef.current
+      if (!currentId || !currentUser) return
+      setSaveStatus('Saving...')
+      const { error } = await supabase
+        .from('documents')
+        .update({ content_json: content, updated_at: new Date().toISOString(), last_updated_by: currentUser.id })
+        .eq('id', currentId)
+      
+      if (error) {
+        toast.error('Failed to save changes')
+        setSaveStatus('Unsaved changes')
+      } else {
+        setSaveStatus('Saved just now')
       }
-    })(),
-    [id, user]
-  )
+    }, 1000)
+  }, [])
 
   const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value

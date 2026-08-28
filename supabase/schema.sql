@@ -37,6 +37,24 @@ CREATE TRIGGER set_documents_updated_at
 BEFORE UPDATE ON public.documents
 FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+-- Trigger for immutability of document id and owner_id
+CREATE OR REPLACE FUNCTION check_document_update()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.id != OLD.id THEN
+    RAISE EXCEPTION 'Cannot change document id';
+  END IF;
+  IF NEW.owner_id != OLD.owner_id THEN
+    RAISE EXCEPTION 'Cannot change document owner';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER enforce_document_immutable_fields
+BEFORE UPDATE ON public.documents
+FOR EACH ROW EXECUTE FUNCTION check_document_update();
+
 -- 3. Document Shares Table
 CREATE TABLE public.document_shares (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -80,15 +98,30 @@ WITH CHECK (id IN (SELECT has_document_access(auth.uid())));
 -- Enable RLS on document_shares
 ALTER TABLE public.document_shares ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Document owners can manage shares" 
+CREATE POLICY "Document owners can select shares" 
 ON public.document_shares 
-FOR ALL 
+FOR SELECT 
 USING (
   document_id IN (
     SELECT id FROM public.documents WHERE owner_id = auth.uid()
   )
-) 
+);
+
+CREATE POLICY "Document owners can insert shares" 
+ON public.document_shares 
+FOR INSERT 
 WITH CHECK (
+  document_id IN (
+    SELECT id FROM public.documents WHERE owner_id = auth.uid()
+  )
+  AND shared_by = auth.uid()
+  AND user_id <> auth.uid()
+);
+
+CREATE POLICY "Document owners can delete shares" 
+ON public.document_shares 
+FOR DELETE 
+USING (
   document_id IN (
     SELECT id FROM public.documents WHERE owner_id = auth.uid()
   )
